@@ -66,7 +66,7 @@ class LoadDataView(APIView):
 #SMS View
 class SmsView(APIView):
     def post(self,request):
-        output=str(predictor([self.request.data["temperature"], self.request.data["humidity"], self.request.data["ph"], self.request.data["moisture"]])[0])
+        output=str(predictor([self.request.data["temperature"], self.request.data["humidity"], self.request.data["ph"], self.request.data["moisture"]]))
         account_sid = 'ACc1770c958b407cedb310af918786da04'
         auth_token = '89f98a027cfafd65fbe4178f9432c429'
         client = Client(account_sid, auth_token)
