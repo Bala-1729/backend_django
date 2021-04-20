@@ -1,7 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import CropsHistorySerializer
+from .serializers import CropsHistorySerializer, NPKValuesSerializer
 from .models import CropsHistory as cs
+from .models import NPKValues as n
 import sys
 import pickle
 import numpy as np
@@ -13,20 +14,36 @@ model=pickle.load(open('model.pkl','rb'));
 model1=pickle.load(open('model1.pkl','rb'))
 
 class PredictCrop(APIView):
-    n,p,k=0,0,0
-    def get(self,request):
-        return Response({"n":self.n,"p":self.p,"k":self.k})
     def post(self, request):
         obj=self.request.data
         serializer = CropsHistorySerializer(data=self.request.data)
         data = [obj[i] for i in obj]
+        print("data: ",data);
         if "" in data:
             data = data[:4]
-        self.n,self.p,self.k=data[4],data[5],data[6]
         output=predictor(data)
         if serializer.is_valid():
             serializer.save(user=self.request.user,crop=output)
         return Response({'crop':output})
+
+class NPKValues(APIView):
+    def get(self, request):
+        npkValues = n.objects.filter(user=self.request.user)
+        if not npkValues:
+            return Response({"message":"create Entries First"})
+        serializer=NPKValuesSerializer(npkValues,many=True)
+        return Response({"npkValues":serializer.data[-1]})
+
+    def post(self,request):
+        obj=self.request.data
+        serializer = NPKValuesSerializer(data=self.request.data)
+        data = [obj[i] for i in obj]
+        print("data npk: ",data)
+        if serializer.is_valid():
+            serializer.save(user=self.request.user)
+
+        return Response({"success"})
+
 
 class CropsHistory(APIView):
     def get(self,request):
@@ -37,9 +54,9 @@ class CropsHistory(APIView):
         serializer=CropsHistorySerializer(cropData,many=True)
         return Response({"CropsHistory":serializer.data})
 
-
 def predictor(data):
     x_test = data
     sample = np.array(x_test).reshape(1,-1)
+    print("sample: ",sample)
     prediction=model.predict(sample) if len(data)==4 else model1.predict(sample)
     return prediction[0]

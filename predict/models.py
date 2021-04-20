@@ -11,3 +11,12 @@ class CropsHistory(models.Model):
 
     def __str__(self):
         return self.crop
+
+class NPKValues(models.Model):
+    n = models.FloatField(null=True)
+    p = models.FloatField(null=True)
+    k = models.FloatField(null=True)
+    user = models.ForeignKey(User,related_name="NPKValues", on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.n+" "+self.p+" "+self.k
