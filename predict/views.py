@@ -11,26 +11,23 @@ crops=['wheat','mungbean','Tea','millet','maize','lentil','jute','cofee','cotton
 
 model=pickle.load(open('model.pkl','rb'));
 model1=pickle.load(open('model1.pkl','rb'))
-n,p,k=0,0,0
 
 class PredictCrop(APIView):
+    n,p,k=0,0,0
+    def get(self,request):
+        return Response({"n":self.n,"p":self.p,"k":self.k})
     def post(self, request):
         obj=self.request.data
         serializer = CropsHistorySerializer(data=self.request.data)
         data = [obj[i] for i in obj]
         if "" in data:
             data = data[:4]
-        else:
-            n,p,k=data[4],data[5],data[6]
+        self.n,self.p,self.k=data[4],data[5],data[6]
         output=predictor(data)
         if serializer.is_valid():
             serializer.save(user=self.request.user,crop=output)
         return Response({'crop':output})
 
-class NPKView(APIView):
-    def get(self,request):
-        return Response({"n":n,"p":p,"k":k})
-        
 class CropsHistory(APIView):
     def get(self,request):
         cropData = cs.objects.filter(user=self.request.user)
