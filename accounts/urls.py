@@ -1,5 +1,5 @@
 from knox import views as knox_views
-from .views import LoginAPI, RegisterAPI, UserAPI, ChangePasswordView, RegisterDeviceAPI, SmsView, LoadDataView
+from .views import LoginAPI, RegisterAPI, UserAPI, ChangePasswordView, RegisterDeviceAPI, SmsView, LoadDataView, NPKValues
 from django.urls import path
 
 urlpatterns = [
@@ -12,4 +12,5 @@ urlpatterns = [
     path('api/register-device/', RegisterDeviceAPI.as_view(), name="register-device"),
     path('api/predict/sms/',SmsView.as_view(), name="SMS"),
     path('api/load-data/',LoadDataView.as_view(),name="load-data"),
+    path('api/npk-values/',NPKValues.as_view(), name="NPKValues")
 ]

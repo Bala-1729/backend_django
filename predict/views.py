@@ -1,8 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import CropsHistorySerializer, NPKValuesSerializer
+from .serializers import CropsHistorySerializer
 from .models import CropsHistory as cs
-from .models import NPKValues as n
 import sys
 import pickle
 import numpy as np
@@ -25,24 +24,6 @@ class PredictCrop(APIView):
         if serializer.is_valid():
             serializer.save(user=self.request.user,crop=output)
         return Response({'crop':output})
-
-class NPKValues(APIView):
-    def get(self, request):
-        npkValues = n.objects.filter(user=self.request.user)
-        if not npkValues:
-            return Response({"message":"create Entries First"})
-        serializer=NPKValuesSerializer(npkValues,many=True)
-        return Response({"npkValues":serializer.data[-1]})
-
-    def post(self,request):
-        obj=self.request.data
-        serializer = NPKValuesSerializer(data=self.request.data)
-        data = [obj[i] for i in obj]
-        print("data npk: ",data)
-        if serializer.is_valid():
-            serializer.save(user=self.request.user)
-
-        return Response({"success"})
 
 
 class CropsHistory(APIView):

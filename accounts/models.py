@@ -15,6 +15,16 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.User.username
 
+class NPKValues(models.Model):
+    n = models.FloatField(null=True)
+    p = models.FloatField(null=True)
+    k = models.FloatField(null=True)
+    deviceId = models.CharField(max_length=256, null=True)
+
+    def __str__(self):
+        return self.n+" "+self.p+" "+self.k
+
+
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
 

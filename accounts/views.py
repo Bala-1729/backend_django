@@ -6,9 +6,10 @@ from knox.views import LoginView as KnoxLoginView
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, ChangePasswordSerializer, UserProfileSerializer
+from .serializers import UserSerializer, RegisterSerializer, ChangePasswordSerializer, UserProfileSerializer, NPKValuesSerializer
 from django.views.decorators.debug import sensitive_post_parameters
 from .models import UserProfile
+from .models import NPKValues as n
 from rest_framework.views import APIView
 import pickle
 import numpy as np
@@ -73,6 +74,25 @@ class SmsView(APIView):
         user = UserProfile.objects.get(DeviceId=self.request.data["deviceId"])
         message = client.messages.create(body="Predicted Crop:"+output,from_='+13012468250',to="+91"+user.PhoneNumber)
         return Response({"mobile":user.PhoneNumber})
+
+class NPKValues(APIView):
+    def get(self, request):
+        npkValues = n.objects.filter(deviceId=self.request.data["deviceId"])
+        if not npkValues:
+            return Response({"message":"create Entries First"})
+        serializer=NPKValuesSerializer(npkValues,many=True)
+        return Response({"npkValues":serializer.data[-1]})
+
+    def post(self,request):
+        obj=self.request.data
+        serializer = NPKValuesSerializer(data=self.request.data)
+        data = [obj[i] for i in obj]
+        user = UserProfile.objects.get(DeviceId=self.request.data["deviceId"])
+        if serializer.is_valid():
+            serializer.save(deviceId=self.request.data["deviceId"])
+
+        return Response({"success"})
+
 
 def predictor(data):
     x_test = data
