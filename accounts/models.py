@@ -22,7 +22,7 @@ class NPKValues(models.Model):
     deviceId = models.CharField(max_length=256, null=True)
 
     def __str__(self):
-        return self.n+" "+self.p+" "+self.k
+        return self.deviceId
 
 
 @receiver(reset_password_token_created)
