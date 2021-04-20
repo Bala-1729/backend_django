@@ -11,5 +11,5 @@ urlpatterns = [
     path('api/change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('api/register-device/', RegisterDeviceAPI.as_view(), name="register-device"),
     path('api/predict/sms/',SmsView.as_view(), name="SMS"),
-    path('api/load-data/',LoadDataView.as_view(),name="load-data")
+    path('api/load-data/',LoadDataView.as_view(),name="load-data"),
 ]
