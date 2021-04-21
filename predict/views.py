@@ -30,8 +30,6 @@ class CropsHistory(APIView):
     def get(self,request):
         cropData = cs.objects.filter(user=self.request.user)
         length=len(cropData)
-        if not cropData:
-            return Response({"message":"create Entries First"})
         serializer=CropsHistorySerializer(cropData,many=True)
         return Response({"CropsHistory":serializer.data})
 
