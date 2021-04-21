@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from knox.models import AuthToken
 from .serializers import UserSerializer, RegisterSerializer, ChangePasswordSerializer, UserProfileSerializer, NPKValuesSerializer
 from django.views.decorators.debug import sensitive_post_parameters
-from .models import UserProfile
+from .models import UserProfile as us
 from .models import NPKValues as n
 from rest_framework.views import APIView
 import pickle
@@ -79,7 +79,7 @@ class SmsView(APIView):
 class NPKValues(APIView):
     def get(self, request):
         npkValues = n.objects.filter(deviceId=self.request.headers.get("deviceId"))
-        user = UserProfile.objects.get(DeviceId=self.request.headers.get("deviceId"))
+        user = us.objects.get(DeviceId=self.request.headers.get("deviceId"))
         if not npkValues:
             return Response({"message":"create Entries First"})
         serializer=NPKValuesSerializer(npkValues,many=True)
@@ -89,9 +89,9 @@ class NPKValues(APIView):
         obj=self.request.data
         serializer = NPKValuesSerializer(data=self.request.data)
         data = [obj[i] for i in obj]
-        user = UserProfile.objects.get(DeviceId=self.request.data["deviceId"])
+        user = us.objects.get(User=self.request.user)
         if serializer.is_valid():
-            serializer.save(deviceId=self.request.data["deviceId"])
+            serializer.save(deviceId=user.DeviceId)
 
         return Response({"success"})
 
