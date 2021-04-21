@@ -73,7 +73,7 @@ class SmsView(APIView):
         client = Client(account_sid, auth_token)
         user = UserProfile.objects.get(DeviceId=self.request.data["deviceId"])
         message = client.messages.create(body="Predicted Crop:"+output,from_='+13012468250',to="+91"+user.PhoneNumber)
-        return Response({"mobile":user.PhoneNumber})
+        return Response({"crop":output})
 
 class NPKValues(APIView):
     def get(self, request):
