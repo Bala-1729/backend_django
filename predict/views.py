@@ -18,11 +18,7 @@ class PredictCrop(APIView):
         serializer = CropsHistorySerializer(data=self.request.data)
         data = [obj[i] for i in obj]
         print("data: ",data);
-        output=""
-        if data[4]=="" and data[5]=="" and data[6]=="" in data:
-            output=predictor(data[:4])
-        else:
-            output=predictor(data)
+        output=predictor(data[:4])
         if serializer.is_valid():
             serializer.save(user=self.request.user,crop=output)
         return Response({'crop':output})
