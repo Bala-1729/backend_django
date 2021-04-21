@@ -77,11 +77,12 @@ class SmsView(APIView):
 
 class NPKValues(APIView):
     def get(self, request):
-        npkValues = n.objects.filter(deviceId=self.request.data["deviceId"])
+        npkValues = n.objects.filter(deviceId=self.request.headers.get("deviceId"))
+        user = UserProfile.objects.get(DeviceId=self.request.headers.get("deviceId"))
         if not npkValues:
             return Response({"message":"create Entries First"})
         serializer=NPKValuesSerializer(npkValues,many=True)
-        return Response({"npkValues":serializer.data[-1]})
+        return Response(serializer.data[-1])
 
     def post(self,request):
         obj=self.request.data
