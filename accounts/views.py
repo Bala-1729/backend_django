@@ -58,11 +58,12 @@ class LoadDataView(APIView):
         return Response({"values":self.array})
 
     def post(self,request):
-        self.array["temperature"]=request.data["temperature"]
-        self.array["humidity"]=request.data["humidity"]
-        self.array["ph"]=request.data["ph"]
-        self.array["moisture"]=request.data["moisture"]
-        return Response({"values":self.array})
+        self.array["temperature"]=self.request.data["temperature"]
+        self.array["humidity"]=self.request.data["humidity"]
+        self.array["ph"]=self.request.data["ph"]
+        self.array["moisture"]=self.request.data["moisture"]
+        output=str(predictor([self.request.data["temperature"], self.request.data["humidity"], self.request.data["ph"], self.request.data["moisture"]]))
+        return Response({"crop":output})
 
 #SMS View
 class SmsView(APIView):
