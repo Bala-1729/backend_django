@@ -6,9 +6,6 @@ class CropsHistory(models.Model):
     humidity = models.FloatField(null=True)
     ph_value = models.FloatField(null=True)
     moisture = models.FloatField(null=True)
-    n = models.FloatField(null=True)
-    p = models.FloatField(null=True)
-    k = models.FloatField(null=True)
     crop = models.CharField(max_length=256, null=True)
     user = models.ForeignKey(User,related_name="CropsHistory", on_delete=models.CASCADE, null=True)
 
