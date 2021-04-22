@@ -19,7 +19,7 @@ class PredictCrop(APIView):
         data = [obj[i] for i in obj]
         output=""
         if "" in data:
-            output=predictor(data[:4])
+            output=predictor(data[3:])
         else:
             output=predictor(data)
         if serializer.is_valid():
