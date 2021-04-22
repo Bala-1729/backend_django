@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import UserProfile, NPKValues
 
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
@@ -26,6 +26,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = '__all__'
+
+class NPKValuesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NPKValues
+        fields = '__all__'
+
 
 # Change Password
 class ChangePasswordSerializer(serializers.Serializer):

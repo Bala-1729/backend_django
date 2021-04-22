@@ -6,9 +6,10 @@ from knox.views import LoginView as KnoxLoginView
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, ChangePasswordSerializer, UserProfileSerializer
+from .serializers import UserSerializer, RegisterSerializer, ChangePasswordSerializer, UserProfileSerializer, NPKValuesSerializer
 from django.views.decorators.debug import sensitive_post_parameters
-from .models import UserProfile
+from .models import UserProfile as us
+from .models import NPKValues as n
 from rest_framework.views import APIView
 import pickle
 import numpy as np
@@ -57,11 +58,12 @@ class LoadDataView(APIView):
         return Response({"values":self.array})
 
     def post(self,request):
-        self.array["temperature"]=request.data["temperature"]
-        self.array["humidity"]=request.data["humidity"]
-        self.array["ph"]=request.data["ph"]
-        self.array["moisture"]=request.data["moisture"]
-        return Response({"values":self.array})
+        self.array["temperature"]=self.request.data["temperature"]
+        self.array["humidity"]=self.request.data["humidity"]
+        self.array["ph"]=self.request.data["ph"]
+        self.array["moisture"]=self.request.data["moisture"]
+        output=str(predictor([self.request.data["temperature"], self.request.data["humidity"], self.request.data["ph"], self.request.data["moisture"]]))
+        return Response({"crop":output})
 
 #SMS View
 class SmsView(APIView):
@@ -70,9 +72,29 @@ class SmsView(APIView):
         account_sid = 'ACc1770c958b407cedb310af918786da04'
         auth_token = '89f98a027cfafd65fbe4178f9432c429'
         client = Client(account_sid, auth_token)
-        user = UserProfile.objects.get(DeviceId=self.request.data["deviceId"])
+        user = us.objects.get(DeviceId=self.request.data["deviceId"])
         message = client.messages.create(body="Predicted Crop:"+output,from_='+13012468250',to="+91"+user.PhoneNumber)
-        return Response({"mobile":user.PhoneNumber})
+        return Response({"crop":output})
+
+class NPKValues(APIView):
+    def get(self, request):
+        npkValues = n.objects.filter(deviceId=self.request.headers.get("deviceId"))
+        user = us.objects.get(DeviceId=self.request.headers.get("deviceId"))
+        if not npkValues:
+            return Response({"message":"create Entries First"})
+        serializer=NPKValuesSerializer(npkValues,many=True)
+        return Response(serializer.data[-1])
+
+    def post(self,request):
+        obj=self.request.data
+        serializer = NPKValuesSerializer(data=self.request.data)
+        data = [obj[i] for i in obj]
+        user = us.objects.get(User=self.request.user)
+        if serializer.is_valid():
+            serializer.save(deviceId=user.DeviceId)
+
+        return Response({"success"})
+
 
 def predictor(data):
     x_test = data
